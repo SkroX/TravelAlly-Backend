@@ -9,6 +9,8 @@ RUN apk add --update --no-cache --virtual .tmp-build-deps \
       gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
 RUN pip3 install --upgrade pip
 RUN pip3 --default-timeout=10000 install -r /requirements.txt
+RUN pip install --upgrade google-auth
+RUN pip install requests
 RUN apk del .tmp-build-deps
 
 
