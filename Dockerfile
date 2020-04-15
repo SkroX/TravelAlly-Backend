@@ -11,6 +11,8 @@ RUN pip3 install --upgrade pip
 RUN pip3 --default-timeout=10000 install -r /requirements.txt
 RUN pip install --upgrade google-auth
 RUN pip install requests
+RUN pip install django-phonenumber-field
+RUN pip install phonenumbers
 RUN apk del .tmp-build-deps
 
 

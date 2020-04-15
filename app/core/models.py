@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from phonenumber_field.modelfields import PhoneNumberField
+from django.conf import settings
 
 # Create your models here.
 
@@ -49,3 +51,22 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
+
+
+class Trip(models.Model):
+
+    organizer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE, related_name='organizer'
+    )
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    additional_info = models.TextField(null=True)
+    extra_people = models.ManyToManyField('UserModel', related_name='member', null=True)
+    start_lat = models.DecimalField(max_digits=15, decimal_places=6)
+    start_lon = models.DecimalField(max_digits=15, decimal_places=6)
+    end_lat = models.DecimalField(max_digits=15, decimal_places=6)
+    end_lon = models.DecimalField(max_digits=15, decimal_places=6)
+    start_name = models.CharField(max_length=255)
+    dest_name = models.CharField(max_length=255)
+    votes = models.IntegerField()
