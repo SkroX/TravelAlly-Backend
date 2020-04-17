@@ -9,5 +9,6 @@ router.register('trips', views.TripViewSet)
 app_name = 'trip'
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('vote/', views.VotesViewSet.as_view(), name='vote')
 ]
