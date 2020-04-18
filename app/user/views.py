@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
-from django.contrib.auth.models import User
+from core.models import UserModel
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
+from . import serializers
 
 from rest_framework.authtoken.models import Token
 # Create your views here.
@@ -79,3 +80,20 @@ class UserLoginView(APIView):
         except ValueError:
             # Invalid token
             return Response({'msg': 'token not verified'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserModelView(APIView):
+
+    def get_object(self, pk):
+        if UserModel.objects.filter(pk=pk).exists():
+            return UserModel.objects.get(pk=pk)
+        else:
+            return None
+
+    def get(self, request, pk, format=None):
+        user = self.get_object(pk)
+        if user:
+            serializer = serializers.UserSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'msg': 'user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
