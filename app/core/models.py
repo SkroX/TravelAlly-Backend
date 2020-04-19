@@ -70,3 +70,8 @@ class Trip(models.Model):
     start_name = models.CharField(max_length=255)
     dest_name = models.CharField(max_length=255)
     voters = models.ManyToManyField('UserModel', related_name='voter')
+
+
+class TripRequest(models.Model):
+    trip = models.ForeignKey('Trip', on_delete=models.CASCADE)
+    requesters = models.ManyToManyField('UserModel')

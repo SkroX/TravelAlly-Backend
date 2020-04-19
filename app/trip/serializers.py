@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Trip
+from core.models import Trip, TripRequest
 from django.contrib.auth import get_user_model
 
 # organizer = models.ForeignKey(
@@ -30,3 +30,9 @@ class TripSerializer(serializers.ModelSerializer):
         fields = ('id', 'start_time', 'end_time', 'additional_info', 'extra_people',
                   'start_lat', 'start_lon', 'end_lat', 'end_lon', 'start_name', 'dest_name', 'voters', 'organizer')
         read_only_fields = ('id', 'voters', 'organizer')
+
+
+class TripRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TripRequest
+        fields = ('id', 'trip', 'requesters')

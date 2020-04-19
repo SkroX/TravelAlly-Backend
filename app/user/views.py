@@ -10,6 +10,12 @@ from rest_framework.permissions import AllowAny
 from . import serializers
 
 from rest_framework.authtoken.models import Token
+
+
+# kumar.shubham - c7b6b9a7131fe44591ab03e0a59e06133010983e
+# shubhamcrick - 03cd5a4853da5ba25200edada9d72432a290e557
+
+
 # Create your views here.
 
 # RESPONSE
