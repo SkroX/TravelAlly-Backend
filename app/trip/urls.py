@@ -11,5 +11,5 @@ app_name = 'trip'
 urlpatterns = [
     path('', include(router.urls)),
     path('vote/', views.VotesView.as_view(), name='vote'),
-    path('request/<int:pk>', views.RequestTripView.as_view(), name='request'),
+    path('request/<int:pk>/', views.RequestTripView.as_view(), name='request'),
 ]

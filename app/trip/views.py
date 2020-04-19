@@ -77,3 +77,29 @@ class RequestTripView(APIView):
                 return Response({'msg': 'can not request in own trip'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'msg': 'no such trip'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        trip = self.get_object(pk)
+        if not trip:
+            return Response({'msg': 'no such trip'}, status=status.HTTP_400_BAD_REQUEST)
+        if self.request.user != trip.organizer:
+            return Response({'msg': 'not your trip'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_id = self.request.data.get("user_id")
+            if UserModel.objects.filter(pk=user_id).exists():
+                user = UserModel.objects.get(pk=user_id)
+                if TripRequest.objects.filter(trip=trip).exists():
+                    triprequest = TripRequest.objects.get(trip=trip)
+                    if user in triprequest.requesters.all():
+                        accept = None
+                        accept = self.request.data.get('accept')
+                        if accept == "True":
+                            trip.extra_people.add(user)
+                            triprequest.requesters.remove(user)
+                            ser = serializers.TripRequestSerializer(triprequest)
+                            return Response(ser.data, status=status.HTTP_200_OK)
+                        elif accept == "False":
+                            triprequest.requesters.remove(user)
+                            ser = serializers.TripRequestSerializer(triprequest)
+                            return Response(ser.data, status=status.HTTP_200_OK)
+        return Response({'msg': 'invalid request'}, status=status.HTTP_400_BAD_REQUEST)
