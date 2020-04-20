@@ -3,16 +3,24 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
 from . import serializers
 from core.models import Trip, UserModel, TripRequest
+from django.core.management import call_command
+from django.db.models import Count
+
+from math import radians, cos, sin, asin, sqrt
 
 # Create your views here.
 
 
 class TripViewSet(viewsets.ModelViewSet):
-    queryset = Trip.objects.all()
     serializer_class = serializers.TripSerializer
 
     def perform_create(self, serializer):
-        serializer.save(organizer=self.request.user, votes=None)
+        serializer.save(organizer=self.request.user)
+
+    def get_queryset(self):
+        # TODO:movet to schedulued job in server
+        call_command('expire_trips')
+        return Trip.objects.all()
 
 
 class VotesView(APIView):
@@ -103,3 +111,47 @@ class RequestTripView(APIView):
                             ser = serializers.TripRequestSerializer(triprequest)
                             return Response(ser.data, status=status.HTTP_200_OK)
         return Response({'msg': 'invalid request'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PopularTrips(APIView):
+
+    def get(self, request):
+        top_trips = Trip.objects.annotate(vote_count=Count('voters')) \
+            .order_by('-vote_count')[:7]
+        print(top_trips)
+        ser = serializers.TripSerializer(top_trips, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
+
+
+class NearTrips(APIView):
+    quer = Trip.objects.all()
+
+    def haversine(self, lon1, lat1, lon2, lat2):
+        """
+        Calculate the great circle distance between two points
+        on the earth (specified in decimal degrees)
+        """
+        # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a))
+        r = 6371  # Radius of earth in kilometers. Use 3956 for miles
+        return c * r
+
+    def get(self, request):
+        radius = float(self.request.query_params.get('radius'))
+        lat = float(self.request.query_params.get('lat'))
+        lon = float(self.request.query_params.get('lon'))
+        for trip in self.quer:
+            a = self.haversine(getattr(trip, 'start_lon'), getattr(trip, 'start_lat'), lon, lat)
+            print(a)
+            print(radius)
+            if a >= radius:
+                self.quer = self.quer.exclude(id=trip.pk)
+
+        ser = serializers.TripSerializer(self.quer, many=True)
+        return Response(ser.data, status=status.HTTP_200_OK)
