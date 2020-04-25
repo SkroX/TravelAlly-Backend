@@ -18,7 +18,7 @@ class TripViewSet(viewsets.ModelViewSet):
         serializer.save(organizer=self.request.user)
 
     def get_queryset(self):
-        # TODO:movet to schedulued job in server
+        # TODO:move to schedulued job in server
         call_command('expire_trips')
         return Trip.objects.all()
 
