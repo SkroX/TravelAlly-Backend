@@ -19,3 +19,18 @@ Google auth is used to verify and get data from idtoken
 - You can run `sudo docker-compose run --rm app sh -c "python manage.py makemigrations"` to create the db migrations.
 - You can run `sudo docker-compose run --rm app sh -c "python manage.py migrate"` to apply the migrations.
 - You can run `sudo docker-compose run --rm app sh -c "python manage.py test"` to run the tests.
+
+# Contribution
+
+- I will be happy to invite new contributors.
+
+- Fork the project to your own account.
+
+- Create your new branch using 
+`git checkout -b [your branch name]`
+  
+- Make sure the changes you made are of good quality and the project is building successfully.
+  
+- Commit your changes to this branch with `git commit -m "meaningful message"`
+
+- Make a pull request.
