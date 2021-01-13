@@ -6,6 +6,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.permissions import AllowAny
 from . import serializers
 
@@ -73,8 +74,8 @@ class UserLoginView(APIView):
                 user = get_user_model().objects.get(email=idinfo['email'])
 
             else:
-                user = get_user_model().objects.create_user(
-                    email=idinfo['email'], name=idinfo['name'], picture=idinfo['picture'], given_name=idinfo['given_name'], family_name=idinfo['family_name'])
+                user = get_user_model().objects.create_user(user_name=request.data['user_name'],
+                                                            email=idinfo['email'], name=idinfo['name'], picture=idinfo['picture'], given_name=idinfo['given_name'], family_name=idinfo['family_name'])
             print(userid)
 
             token, _ = Token.objects.get_or_create(user=user)
@@ -89,6 +90,12 @@ class UserLoginView(APIView):
 
 
 class UserModelView(APIView):
+    permission_classes = [AllowAny, ]
+
+    def get_serializer_class(self):
+        if self.action == 'options':
+            return serializers.UserAutoCompSer
+        return serializers.UserSerializer
 
     def get_object(self, pk):
         if UserModel.objects.filter(pk=pk).exists():
@@ -103,3 +110,14 @@ class UserModelView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'msg': 'user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def options(self, request, *args, **kwargs):
+        q = request.query_params.get("q")
+        query = Q(user_name__icontains=q)
+        query |= Q(name__icontains=q)
+        query |= Q(family_name__icontains=q)
+        query_set = UserModel.objects.all().filter(query)
+
+        serializer = serializers.UserAutoCompSer(query_set, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

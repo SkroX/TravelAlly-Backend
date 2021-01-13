@@ -18,9 +18,9 @@ def recipe_image_file_path(instance, filename):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, password=None, **extra_fields):
 
-        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user = self.model(**extra_fields)
 
         user.set_password(password)
 
@@ -28,9 +28,9 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email, **extra_fields):
+    def create_superuser(self, **extra_fields):
 
-        user = self.create_user(email, **extra_fields)
+        user = self.create_user(**extra_fields)
         user.is_staff = True
         user.is_superuser = True
 
@@ -54,11 +54,13 @@ class UserModel(AbstractBaseUser, PermissionsMixin):
     picture = models.URLField(default=None, blank=True, null=True)
     given_name = models.CharField(max_length=255)
     family_name = models.CharField(max_length=255, blank=True)
+    user_name = models.CharField(
+        max_length=255, unique=True, null=False, blank=False)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'user_name'
 
     objects = UserManager()
 

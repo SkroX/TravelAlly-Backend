@@ -135,11 +135,13 @@ class RequestTripView(APIView):
                         if accept == "True":
                             trip.extra_people.add(user)
                             triprequest.requesters.remove(user)
-                            ser = serializers.TripRequestSerializer(triprequest)
+                            ser = serializers.TripRequestSerializer(
+                                triprequest)
                             return Response(ser.data, status=status.HTTP_200_OK)
                         elif accept == "False":
                             triprequest.requesters.remove(user)
-                            ser = serializers.TripRequestSerializer(triprequest)
+                            ser = serializers.TripRequestSerializer(
+                                triprequest)
                             return Response(ser.data, status=status.HTTP_200_OK)
         return Response({'msg': 'invalid request'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -151,7 +153,8 @@ class PopularTrips(APIView):
             .order_by('-vote_count')[:7]
         print(top_trips)
         ser = serializers.TripSerializer(top_trips, many=True)
-        return Response(ser.data, status=status.HTTP_200_OK)
+        obj = {"trips": ser.data}
+        return Response(obj, status=status.HTTP_200_OK)
 
 
 class NearTrips(APIView):
@@ -178,11 +181,13 @@ class NearTrips(APIView):
         lat = float(self.request.query_params.get('lat'))
         lon = float(self.request.query_params.get('lon'))
         for trip in self.quer:
-            a = self.haversine(getattr(trip, 'start_lon'), getattr(trip, 'start_lat'), lon, lat)
+            a = self.haversine(getattr(trip, 'start_lon'),
+                               getattr(trip, 'start_lat'), lon, lat)
             print(a)
             print(radius)
             if a >= radius:
                 self.quer = self.quer.exclude(id=trip.pk)
 
         ser = serializers.TripSerializer(self.quer, many=True)
-        return Response(ser.data, status=status.HTTP_200_OK)
+        obj = {"trips": ser.data}
+        return Response(obj, status=status.HTTP_200_OK)

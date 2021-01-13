@@ -16,4 +16,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
 
-        fields = ('email', 'name', 'picture', 'given_name', 'family_name', 'is_staff', 'is_active')
+        fields = ('email', 'name', 'picture', 'given_name',
+                  'family_name', 'is_staff', 'is_active')
+
+
+class UserAutoCompSer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+
+        fields = ('id', 'name', 'picture', 'family_name', )
