@@ -74,12 +74,13 @@ class UserLoginView(APIView):
                 user = get_user_model().objects.get(email=idinfo['email'])
 
             else:
-                user = get_user_model().objects.create_user(user_name=request.data['user_name'],
+                user = get_user_model().objects.create_user(user_name=idinfo['email'],
                                                             email=idinfo['email'], name=idinfo['name'], picture=idinfo['picture'], given_name=idinfo['given_name'], family_name=idinfo['family_name'])
             print(userid)
 
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key},
+            serializer = serializers.UserSerializer(user)
+            return Response({'token': token.key, 'user': serializer.data},
                             status=status.HTTP_200_OK)
 
             # return Response({'name': idinfo['name'], 'email': idinfo['email']}, status=status.HTTP_200_OK)

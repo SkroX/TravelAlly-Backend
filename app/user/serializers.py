@@ -11,13 +11,13 @@ from django.contrib.auth import get_user_model
 # is_active = models.BooleanField(default=True)
 # is_staff = models.BooleanField(default=False)
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
 
-        fields = ('email', 'name', 'picture', 'given_name',
+        fields = ('id', 'email', 'name', 'picture', 'given_name',
                   'family_name', 'is_staff', 'is_active')
+        read_only_fields = ('id',)
 
 
 class UserAutoCompSer(serializers.ModelSerializer):
