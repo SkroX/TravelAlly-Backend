@@ -158,8 +158,6 @@ class PopularTrips(APIView):
 
 
 class NearTrips(APIView):
-    quer = Trip.objects.all()
-
     def haversine(self, lon1, lat1, lon2, lat2):
         """
         Calculate the great circle distance between two points
@@ -177,10 +175,11 @@ class NearTrips(APIView):
         return c * r
 
     def get(self, request):
+        quer = Trip.objects.all()
         radius = float(self.request.query_params.get('radius'))
         lat = float(self.request.query_params.get('lat'))
         lon = float(self.request.query_params.get('lon'))
-        for trip in self.quer:
+        for trip in quer:
             a = self.haversine(getattr(trip, 'start_lon'),
                                getattr(trip, 'start_lat'), lon, lat)
             print(a)
@@ -188,8 +187,8 @@ class NearTrips(APIView):
             print(getattr(trip, 'start_lat'))
             print(radius)
             if a >= radius:
-                self.quer = self.quer.exclude(id=trip.pk)
+                quer = quer.exclude(id=trip.pk)
 
-        ser = serializers.TripSerializer(self.quer, many=True)
+        ser = serializers.TripSerializer(quer, many=True)
         obj = {"trips": ser.data}
         return Response(obj, status=status.HTTP_200_OK)
