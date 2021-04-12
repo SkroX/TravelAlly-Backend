@@ -184,6 +184,8 @@ class NearTrips(APIView):
             a = self.haversine(getattr(trip, 'start_lon'),
                                getattr(trip, 'start_lat'), lon, lat)
             print(a)
+            print(getattr(trip, 'start_lon'))
+            print(getattr(trip, 'start_lat'))
             print(radius)
             if a >= radius:
                 self.quer = self.quer.exclude(id=trip.pk)
